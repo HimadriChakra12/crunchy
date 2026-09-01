@@ -1,5 +1,5 @@
 alsa-utils
-amd-ucode
+syslinux
 arch-install-scripts
 archinstall
 base
@@ -9,7 +9,6 @@ brltty
 btrfs-progs
 cryptsetup
 ddrescue
-dhcpcd
 diffutils
 dmidecode
 dosfstools
@@ -23,7 +22,6 @@ foot-terminfo
 ghostty-terminfo
 gpm
 gptfdisk
-grub
 hdparm
 intel-ucode
 iw
@@ -51,7 +49,6 @@ openssh
 parted
 pcsclite
 pv
-refind
 reflector
 rsync
 rxvt-unicode-terminfo
@@ -60,7 +57,6 @@ smartmontools
 sof-firmware
 squashfs-tools
 sudo
-syslinux
 systemd-resolvconf
 tcpdump
 terminus-font
@@ -68,7 +64,6 @@ usbmuxd
 usbutils
 virtualbox-guest-utils
 wireless-regdb
-wpa_supplicant
 xdg-utils
 xfsprogs
 
@@ -132,3 +127,7 @@ imlib2
 sdl3
 sdl2_image
 intltool
+freetype2
+libexif
+libfm
+libfm-gtk3

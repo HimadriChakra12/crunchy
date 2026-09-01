@@ -12,7 +12,8 @@ mkdir -p "$PKG"
 # build deps (git, make, gcc) now come from packages.x86_64 directly —
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
-SIMPLE_TARGETS=(rot shot px det dtop baph appache lock fetch)
+SIMPLE_TARGETS=(rot shot px dtop baph lock fetch)
+SH_ONLY=(rsxiv)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
 
@@ -20,6 +21,11 @@ for t in "${SIMPLE_TARGETS[@]}"; do
   echo ">> building $t"
   [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
   ( cd "$PKG/$t" && make && make install )
+done
+for t in "${SH_ONLY[@]}"; do
+  echo ">> building $t"
+  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
+  ( cd "$PKG/$t" && bash install.sh )
 done
 for t in "${SXBAR_ONLY[@]}"; do
   echo ">> building $t (no install)"
@@ -37,9 +43,6 @@ done
 # nvim config — cloned straight into root's home, not built
 echo ">> cloning nvim config"
 [ -d /root/.config/nvim ] || git clone "$URL/himstart.nvim" /root/.config/nvim
-
-# clean up build artifacts so they don't bloat the squashfs
-rm -rf "$PKG"
 
 # root's default shell in releng is zsh (via grml-zsh-config) — force bash instead
 chsh -s /bin/bash root
