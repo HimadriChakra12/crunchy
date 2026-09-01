@@ -5,18 +5,14 @@
 # pass --offline). Removed automatically before the final squashfs is
 # sealed, so none of this lingers in the shipped image — only the
 # compiled binaries do.
-
 set -euo pipefail
-
 URL="https://github.com/HimadriChakra12"
 PKG="/root/pkg"
 mkdir -p "$PKG"
-
 # build deps (git, make, gcc) now come from packages.x86_64 directly —
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
-
-SIMPLE_TARGETS=(rot shot px sxat rsxiv few det wtf whot pw dtop baph appache lock fetch)
+SIMPLE_TARGETS=(rot shot px det dtop baph appache lock fetch)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
 
@@ -25,13 +21,11 @@ for t in "${SIMPLE_TARGETS[@]}"; do
   [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
   ( cd "$PKG/$t" && make && make install )
 done
-
 for t in "${SXBAR_ONLY[@]}"; do
   echo ">> building $t (no install)"
-  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
-  ( cd "$PKG/$t" && make )
+  [ -d "$PKG/$t" ] || git clone "https://github.com/uint23/$t" "$PKG/$t"
+  ( cd "$PKG/$t" && make && make install )
 done
-
 for t in "${RDFM_TARGET[@]}"; do
   echo ">> building $t"
   [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
@@ -39,6 +33,10 @@ for t in "${RDFM_TARGET[@]}"; do
     git checkout -b config 2>/dev/null || git checkout config && \
     bash install.bash )
 done
+
+# nvim config — cloned straight into root's home, not built
+echo ">> cloning nvim config"
+[ -d /root/.config/nvim ] || git clone "$URL/himstart.nvim" /root/.config/nvim
 
 # clean up build artifacts so they don't bloat the squashfs
 rm -rf "$PKG"

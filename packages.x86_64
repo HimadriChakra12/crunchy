@@ -184,3 +184,5 @@ base-devel
 sdl2
 sdl2_ttf
 imlib2
+sdl3
+sdl2_image
