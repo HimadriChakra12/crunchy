@@ -1,0 +1,59 @@
+# layout and style
+bottom_bar          : true
+height              : 25
+vertical_padding    : 0
+horizontal_padding  : 0
+text_padding        : 0
+border              : false
+border_width        : 1
+background_colour   : #282828
+foreground_colour   : #d8c9a4
+border_colour       : #e2d2ab
+font                : "Jetbrains Mono Nerd Font"
+font_size           : 13
+
+# modules
+module.0.name       : clock
+module.0.cmd        : date '+%H:%M:%S'
+module.0.enabled    : true
+module.0.interval   : 1
+
+module.1.name       : date
+module.1.cmd        : date '+%Y-%m-%d'
+module.1.enabled    : true
+module.1.interval   : 60
+
+module.2.name       : battery
+module.2.cmd        : upower -i "$(upower -e | grep BAT)" | awk '/state:/ {s=$2} /percentage:/ {p=$2} END {if (s=="charging") print "C " p; else if (s=="fully-charged") print "F " p; else print "B " p}'
+module.2.enabled    : true
+module.2.interval   : 10
+
+module.3.name       : volume
+module.3.cmd        : pactl get-sink-mute @DEFAULT_SINK@ | grep -q yes && echo MUTE || echo "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1)"
+module.3.enabled    : true
+module.3.interval   : 1
+
+module.4.name       : cpu
+module.4.cmd        : top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\([0-9.]*\)%* id.*/\1/' | awk '{print 100-$1"%"}'
+module.4.enabled    : true
+module.4.interval   : 3
+
+module.5.name       : mem
+module.5.cmd        : free -h | awk '/^Mem/ { print $3 }' | sed s/i//g
+module.5.enabled    : true
+module.5.interval   : 3
+
+module.6.name       : trayspace
+module.6.cmd        : tray
+module.6.enabled    : true
+module.6.interval   : 3
+
+workspaces.labels              : ! @ $ % ^ & * ( )
+workspaces.active_background   : #e2d2ab
+workspaces.active_foreground   : #282828
+workspaces.inactive_background : #282828
+workspaces.inactive_foreground : #e2d2ab
+workspaces.padding_left        : 10
+workspaces.padding_right       : 10
+workspaces.spacing             : 1
+workspaces.position            : left

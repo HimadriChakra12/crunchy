@@ -1,0 +1,32 @@
+#!/bin/bash
+# Simple Rofi menu for screen recording
+
+RECORD_SCRIPT="${SCREENRECORD_SCRIPT:-$HOME/.config/sxwm-conf/scripts/screenrecord/screenrecord}"
+
+# Check if recording is active
+is_recording() {
+  local pid_file="/tmp/screenrecord_pid_${USER}"
+  [[ -f "$pid_file" ]] && kill -0 $(cat "$pid_file" 2>/dev/null) 2>/dev/null
+}
+
+if is_recording; then
+  # Show stop option
+  choice=$(echo "⏹ Stop Recording" | rofi -dmenu -i -p "Recording" -theme-str 'window {width: 300px;}')
+  
+  [[ "$choice" == "⏹ Stop Recording" ]] && "$RECORD_SCRIPT"
+else
+  # Show start options
+  choice=$(printf "%s\n" \
+    "🎬 Record" \
+    "🎬🎤 Record + Audio" | \
+    rofi -dmenu -i -p "Screen Record" -theme-str 'window {width: 300px;}')
+  
+  case "$choice" in
+    "🎬 Record")
+      "$RECORD_SCRIPT"
+      ;;
+    "🎬🎤 Record + Audio")
+      "$RECORD_SCRIPT" --with-audio
+      ;;
+  esac
+fi

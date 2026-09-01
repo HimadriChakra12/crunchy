@@ -1,0 +1,26 @@
+gui:
+  theme:
+    activeBorderColor:
+      - 'green'
+      - 'bold'
+    inactiveBorderColor:
+      - 'white'
+    optionsTextColor:
+      - 'cyan'
+    selectedLineBgColor:
+      - 'black'
+    selectedRangeBgColor:
+      - 'yellow'
+    cherryPickedCommitBgColor:
+      - 'blue'
+    cherryPickedCommitFgColor:
+      - 'white'
+    markedBaseCommitFgColor:
+      - 'yellow'
+    markedBaseCommitBgColor:
+      - 'default'
+
+  showIcons: true
+  showCommandLog: true
+  showBottomLine: true
+  showFileTree: true

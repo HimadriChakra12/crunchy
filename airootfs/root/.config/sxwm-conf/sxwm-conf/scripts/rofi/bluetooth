@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+# Lightweight Bluetooth Rofi Script
+# Simplified but robust scanning
+
+set -euo pipefail
+
+ROFI="rofi -dmenu -i -p Bluetooth"
+NOTIFY="notify-send -a Bluetooth"
+SCAN_TIME=8
+
+# Ensure Bluetooth is powered on
+power=$(bluetoothctl show | awk '/Powered:/ {print $2}')
+if [[ "$power" != "yes" ]]; then
+    bluetoothctl power on >/dev/null
+    $NOTIFY "Bluetooth Enabled" -t 2000
+    sleep 1
+fi
+
+# Start scan with proper background handling
+scan_log=$(mktemp)
+trap "rm -f '$scan_log'" EXIT
+
+$NOTIFY "Scanning for devices..." -t 2000
+
+# Use bluetoothctl with timeout for cleaner scanning
+(bluetoothctl --timeout "$SCAN_TIME" scan on 2>&1 || true) > "$scan_log" &
+scan_pid=$!
+
+# Wait for scan to complete
+wait "$scan_pid" 2>/dev/null || true
+bluetoothctl scan off >/dev/null 2>&1 || true
+
+# Function to get device status
+get_status() {
+    local mac="$1"
+    local info=$(bluetoothctl info "$mac" 2>/dev/null)
+    
+    if echo "$info" | grep -q "Connected: yes"; then
+        echo "CONNECTED"
+    elif echo "$info" | grep -q "Paired: yes"; then
+        echo "PAIRED"
+    else
+        echo "NEW"
+    fi
+}
+
+# Collect all devices
+declare -A devices
+declare -A device_names
+
+# Get paired devices
+while read -r line; do
+    mac=$(echo "$line" | awk '{print $2}')
+    name=$(echo "$line" | cut -d' ' -f3-)
+    devices["$mac"]=$(get_status "$mac")
+    device_names["$mac"]="$name"
+done < <(bluetoothctl devices 2>/dev/null)
+
+# Get newly scanned devices
+while read -r line; do
+    mac=$(echo "$line" | awk '{print $3}')
+    name=$(echo "$line" | cut -d' ' -f4-)
+    
+    # Only add if not already in list
+    if [[ -z "${devices[$mac]:-}" ]]; then
+        devices["$mac"]="NEW"
+        device_names["$mac"]="$name"
+    fi
+done < <(grep "^\[NEW\] Device" "$scan_log" 2>/dev/null | sort -u -t' ' -k3,3)
+
+# Build menu
+menu="🔴 Power Off\n🔄 Rescan\n---"
+
+# Sort devices by status: Connected > Paired > New
+for status in CONNECTED PAIRED NEW; do
+    for mac in "${!devices[@]}"; do
+        if [[ "${devices[$mac]}" == "$status" ]]; then
+            name="${device_names[$mac]}"
+            case "$status" in
+                CONNECTED) prefix="✓ [CON]" ;;
+                PAIRED)    prefix="◆ [PAIR]" ;;
+                NEW)       prefix="+ [NEW]" ;;
+            esac
+            menu+="\n$prefix $mac $name"
+        fi
+    done
+done
+
+# Show menu
+choice=$(echo -e "$menu" | $ROFI)
+
+[[ -z "$choice" ]] && exit 0
+
+# Handle selection
+case "$choice" in
+    "🔴 Power Off")
+        bluetoothctl power off >/dev/null
+        $NOTIFY "Bluetooth Disabled"
+        exit 0
+        ;;
+    "🔄 Rescan")
+        exec "$0"
+        ;;
+    "---")
+        exit 0
+        ;;
+    *)
+        # Extract MAC address
+        mac=$(echo "$choice" | grep -oE '([0-9A-F]{2}:){5}[0-9A-F]{2}')
+        name=$(echo "$choice" | sed -E 's/.*[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2} //')
+        
+        [[ -z "$mac" ]] && exit 1
+        
+        info=$(bluetoothctl info "$mac" 2>/dev/null)
+        paired=$(echo "$info" | awk '/Paired:/ {print $2}')
+        connected=$(echo "$info" | awk '/Connected:/ {print $2}')
+        
+        # Pair if needed
+        if [[ "$paired" != "yes" ]]; then
+            $NOTIFY "Pairing" "$name"
+            if ! bluetoothctl pair "$mac" 2>&1 | grep -qv "Failed"; then
+                $NOTIFY "Pairing failed" "$name" -u critical
+                exit 1
+            fi
+            bluetoothctl trust "$mac" >/dev/null
+            sleep 1
+        fi
+        
+        # Connect/Disconnect
+        if [[ "$connected" == "yes" ]]; then
+            if bluetoothctl disconnect "$mac" >/dev/null 2>&1; then
+                $NOTIFY "Disconnected" "$name"
+            else
+                $NOTIFY "Disconnect failed" "$name" -u critical
+            fi
+        else
+            $NOTIFY "Connecting..." "$name"
+            if bluetoothctl connect "$mac" >/dev/null 2>&1; then
+                $NOTIFY "Connected" "$name"
+            else
+                $NOTIFY "Connection failed" "$name" -u critical
+            fi
+        fi
+        ;;
+esac

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+#
+# dm-bookman-firefox
+# Search Firefox bookmarks + history with rofi
+# Dependencies: rofi, sqlite3, firefox
+#
+
+set -euo pipefail
+
+CACHE_DIR="${HOME}/.cache/dm-bookman"
+CACHE_FILE="${CACHE_DIR}/firefox_cache"
+SEPARATOR="──────────"
+
+mkdir -p "${CACHE_DIR}"
+
+get_firefox_db() {
+    # Get default Firefox profile
+    profile=$(grep '^Path=' ~/.mozilla/firefox/profiles.ini | head -n1 | cut -d= -f2)
+    echo "${HOME}/.mozilla/firefox/${profile}/places.sqlite"
+}
+
+generate_cache() {
+    DB="$(get_firefox_db)"
+
+    [[ -f "$DB" ]] || exit 1
+
+    # Refresh cache if older than 3 minutes
+    if [[ -f "${CACHE_FILE}" ]]; then
+        if [ $(($(date +%s) - $(date +%s -r "${CACHE_FILE}"))) -lt 180 ]; then
+            return
+        fi
+    fi
+
+    TMP_DB="/tmp/places_copy_$$.sqlite"
+    cp "$DB" "$TMP_DB"
+
+    {
+        # Bookmarks
+        sqlite3 "$TMP_DB" "
+        SELECT b.title || ' - ' || p.url
+        FROM moz_bookmarks b
+        JOIN moz_places p ON b.fk = p.id
+        WHERE p.url LIKE 'http%';
+        "
+
+        echo "$SEPARATOR"
+
+        # History
+        sqlite3 "$TMP_DB" "
+        SELECT p.title || ' - ' || p.url
+        FROM moz_places p
+        JOIN moz_historyvisits h ON h.place_id = p.id
+        WHERE p.url LIKE 'http%'
+        ORDER BY h.visit_date DESC;
+        "
+    } 2>/dev/null | sed '/^ - /d' | sort -u > "${CACHE_FILE}"
+
+    rm -f "$TMP_DB"
+}
+
+main() {
+    generate_cache
+
+    choice=$(cat "${CACHE_FILE}" | \
+        rofi -dmenu -i -matching fuzzy -p "Firefox:")
+
+    if [[ -n "${choice}" && "${choice}" != "${SEPARATOR}" ]]; then
+        url="${choice##* - }"
+        nohup firefox "$url" >/dev/null 2>&1 &
+    fi
+}
+
+main
+

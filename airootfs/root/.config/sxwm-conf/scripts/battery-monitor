@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+THRESHOLD=20
+CHECK_INTERVAL=60   # seconds
+NOTIFIED=0
+
+while true; do
+    # Get battery percentage (works on most laptops)
+    BATTERY_LEVEL=$(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -n 1)
+
+    # Get charging status
+    STATUS=$(cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -n 1)
+
+    if [[ "$STATUS" == "Discharging" && "$BATTERY_LEVEL" -le "$THRESHOLD" ]]; then
+        if [[ "$NOTIFIED" -eq 0 ]]; then
+            notify-send -u critical \
+                "⚠ Low Battery" \
+                "Battery is at ${BATTERY_LEVEL}%. Plug in your charger."
+            NOTIFIED=1
+        fi
+    else
+        # Reset notification flag once charging or battery rises
+        NOTIFIED=0
+    fi
+
+    sleep "$CHECK_INTERVAL"
+done
+

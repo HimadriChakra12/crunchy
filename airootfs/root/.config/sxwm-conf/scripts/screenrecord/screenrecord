@@ -1,0 +1,237 @@
+#!/bin/bash
+# Simple FFmpeg screen recorder - full screen only
+
+set -euo pipefail
+
+# Configuration
+[[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
+OUTPUT_DIR="${SCREENRECORD_DIR:-${XDG_VIDEOS_DIR:-$HOME/Videos}}"
+PID_FILE="/tmp/screenrecord_pid_${USER}"
+STATE_FILE="/tmp/screenrecord_state_${USER}"
+LOG_FILE="/tmp/screenrecord_error_${USER}.log"
+
+# Ensure output directory exists
+mkdir -p "$OUTPUT_DIR"
+
+# Parse arguments
+AUDIO="false"
+[[ "${1:-}" == "--with-audio" ]] && AUDIO="true"
+
+# Check if recording
+is_recording() {
+  [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null
+}
+
+# Cleanup function
+cleanup() {
+  pkill -SIGINT wf-recorder 2>/dev/null || true
+  rm -f "$PID_FILE" "$STATE_FILE"
+}
+
+# Stop recording
+stop_recording() {
+  local killed=false
+  
+  if [[ -f "$PID_FILE" ]]; then
+    local pid
+    pid=$(cat "$PID_FILE")
+    
+    if kill -0 "$pid" 2>/dev/null; then
+      # Send graceful termination signal
+      kill -INT "$pid" 2>/dev/null || true
+      
+      # Wait for proper finalization (up to 5 seconds)
+      local count=0
+      while kill -0 "$pid" 2>/dev/null && [ $count -lt 50 ]; do
+        sleep 0.1
+        ((count++))
+      done
+      
+      # Force kill if still running
+      if kill -0 "$pid" 2>/dev/null; then
+        notify-send "Warning" "Force stopping recording" -u normal -t 2000
+        kill -KILL "$pid" 2>/dev/null || true
+        sleep 0.2
+      fi
+      killed=true
+    fi
+  fi
+  
+  # Also kill any lingering FFmpeg/wf-recorder processes
+  if pgrep -f "ffmpeg.*x11grab" >/dev/null; then
+    pkill -SIGINT -f "ffmpeg.*x11grab" 2>/dev/null || true
+    sleep 0.5
+    pkill -KILL -f "ffmpeg.*x11grab" 2>/dev/null || true
+    killed=true
+  fi
+  
+  if pgrep wf-recorder >/dev/null; then
+    pkill -SIGINT wf-recorder 2>/dev/null || true
+    sleep 0.5
+    pkill -KILL wf-recorder 2>/dev/null || true
+    killed=true
+  fi
+  
+  cleanup
+  
+  if ! $killed; then
+    notify-send "Error" "No active recording found" -u normal -t 2000
+    return 1
+  fi
+  
+  # Verify file was created and has content
+  if [[ -f "$STATE_FILE" ]]; then
+    local filename
+    filename=$(cat "$STATE_FILE")
+    if [[ -f "$filename" ]] && [[ -s "$filename" ]]; then
+      notify-send "Recording Stopped" "Saved: $(basename "$filename")" -t 2000
+    else
+      notify-send "Recording Stopped" "Video saved to $OUTPUT_DIR" -t 2000
+    fi
+  else
+    notify-send "Recording Stopped" "Video saved to $OUTPUT_DIR" -t 2000
+  fi
+}
+
+# Record with wf-recorder (Wayland)
+record_wayland() {
+  local filename="$OUTPUT_DIR/recording-$(date +'%Y%m%d-%H%M%S').mp4"
+  local cmd=(wf-recorder -f "$filename")
+  
+  [[ "$AUDIO" == "true" ]] && cmd+=(--audio)
+  
+  # Start recording
+  "${cmd[@]}" >"$LOG_FILE" 2>&1 &
+  local pid=$!
+  
+  # Verify process started
+  sleep 0.3
+  if ! kill -0 "$pid" 2>/dev/null; then
+    notify-send "Error" "wf-recorder failed to start. Check $LOG_FILE" -u critical -t 5000
+    return 1
+  fi
+  
+  echo "$pid" > "$PID_FILE"
+  echo "$filename" > "$STATE_FILE"
+}
+
+# Record with ffmpeg (X11)
+record_x11() {
+  local filename="$OUTPUT_DIR/recording-$(date +'%Y%m%d-%H%M%S').mp4"
+  local geometry
+  
+  # Get screen geometry
+  if ! geometry=$(xdpyinfo 2>/dev/null | awk '/dimensions:/ {print $2}'); then
+    notify-send "Error" "Could not get screen dimensions" -u critical -t 3000
+    return 1
+  fi
+  
+  local cmd=(
+    ffmpeg -y
+    -f x11grab
+    -framerate 30
+    -video_size "$geometry"
+    -i "$DISPLAY"
+  )
+  
+  # Add audio if requested
+  if [[ "$AUDIO" == "true" ]]; then
+    if command -v pactl &>/dev/null; then
+      local sink
+      sink=$(pactl get-default-sink 2>/dev/null || echo "")
+      if [[ -n "$sink" ]]; then
+        cmd+=(-f pulse -i "$sink.monitor")
+      else
+        notify-send "Warning" "Could not detect audio device" -u normal -t 2000
+      fi
+    else
+      cmd+=(-f alsa -i default)
+    fi
+  fi
+  
+  # Video encoding settings
+  cmd+=(
+    -c:v libx264
+    -preset veryfast
+    -crf 23
+    -pix_fmt yuv420p
+    -movflags +faststart
+  )
+  
+  # Audio encoding
+  [[ "$AUDIO" == "true" ]] && cmd+=(-c:a aac -b:a 128k)
+  
+  cmd+=("$filename")
+  
+  # Start recording
+  "${cmd[@]}" >"$LOG_FILE" 2>&1 &
+  local pid=$!
+  
+  # Verify process started
+  sleep 0.3
+  if ! kill -0 "$pid" 2>/dev/null; then
+    notify-send "Error" "FFmpeg failed to start. Check $LOG_FILE" -u critical -t 5000
+    return 1
+  fi
+  
+  echo "$pid" > "$PID_FILE"
+  echo "$filename" > "$STATE_FILE"
+}
+
+# Detect display server
+detect_display_server() {
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]]; then
+    echo "wayland"
+  elif [[ -n "${DISPLAY:-}" ]]; then
+    echo "x11"
+  else
+    echo "unknown"
+  fi
+}
+
+# Main
+main() {
+  # If already recording, stop it
+  if is_recording; then
+    stop_recording
+    exit 0
+  fi
+  
+  # Detect display server
+  local display_server
+  display_server=$(detect_display_server)
+  
+  case "$display_server" in
+    wayland)
+      if ! command -v wf-recorder &>/dev/null; then
+        notify-send "Error" "wf-recorder not installed\nInstall: sudo pacman -S wf-recorder" -u critical -t 5000
+        exit 1
+      fi
+      record_wayland || exit 1
+      ;;
+    x11)
+      if ! command -v ffmpeg &>/dev/null; then
+        notify-send "Error" "ffmpeg not installed\nInstall: sudo pacman -S ffmpeg" -u critical -t 5000
+        exit 1
+      fi
+      if ! command -v xdpyinfo &>/dev/null; then
+        notify-send "Error" "xdpyinfo not installed\nInstall: sudo pacman -S xorg-xdpyinfo" -u critical -t 5000
+        exit 1
+      fi
+      record_x11 || exit 1
+      ;;
+    *)
+      notify-send "Error" "No display server detected" -u critical -t 3000
+      exit 1
+      ;;
+  esac
+  
+  notify-send "Recording Started" "Full screen recording in progress" -t 2000
+  
+  # Start notification indicator if available
+  if [[ -x "$HOME/.local/bin/screenrecord-indicator.sh" ]]; then
+    "$HOME/.local/bin/screenrecord-indicator.sh" &
+  fi
+}
+
+main "$@"

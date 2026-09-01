@@ -1,0 +1,109 @@
+#!/usr/bin/env sh
+# author: gotbletu (adapted for rofi)
+# desc: control cmus via rofi
+# depend: rofi cmus coreutils awk notify-send
+
+track_time() {
+    duration_total="$(cmus-remote -Q | awk '/duration / {print $2}')"
+    duration_min=$((duration_total / 60))
+    duration_sec=$((duration_total % 60))
+    position_total="$(cmus-remote -Q | awk '/position / {print $2}')"
+    position_min=$((position_total / 60))
+    position_sec=$((position_total % 60))
+}
+
+mylist() {
+cat <<EOF
+play-pause
+previous
+next
+stop
+random
+queue
+status
+shuffle-toggle
+repeat-toggle
+repeat-current
+aaa-toggle
+seek-forward +10s
+seek-backward -10s
+seek-forward +1m
+seek-backward -1m
+EOF
+}
+
+# Launch rofi menu
+selected="$(mylist | rofi -dmenu -i -p "cmus: ")"
+
+[ -z "$selected" ] && exit
+
+case $selected in
+  random)
+    cmus-remote --clear --queue
+    cmus-remote --queue "$(shuf -n 1 < ~/.cmus/lib.pl)"
+    cmus-remote --next --play
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  queue)
+    selected_queue="$(rofi -dmenu -i -multi-select -p "cmus >>> queue song(s): " < ~/.cmus/lib.pl)"
+    [ -z "$selected_queue" ] && exit
+    cmus-remote --clear --queue
+    echo "$selected_queue" | while read -r line; do cmus-remote --queue "$line"; done
+    cmus-remote --next --play
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  status)
+    notify-send -t 10000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ || /shuffle/ || /vol_/ || /repeat/ {print substr($0, index($0,$2)) }')"
+    ;;
+  next)
+    cmus-remote --next --play
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  previous)
+    cmus-remote --prev --prev --play
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  play-pause)
+    cmus-remote --pause
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/ artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  stop)
+    cmus-remote --stop
+    ;;
+  shuffle-toggle)
+    cmus-remote --shuffle
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/shuffle/ {print substr($0, index($0,$2)) }')"
+    ;;
+  repeat-toggle)
+    cmus-remote --repeat
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/repeat / {print substr($0, index($0,$2)) }')"
+    ;;
+  repeat-current)
+    cmus-remote -C "toggle repeat_current"
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/repeat_current/ || / artist / || /album / || /title / || /date/ {print substr($0, index($0,$2)) }')"
+    ;;
+  aaa-toggle)
+    cmus-remote -C "toggle aaa_mode"
+    notify-send -t 5000 --icon=info "cmus" "$(cmus-remote -Q | awk '/aaa_mode/ {print substr($0, index($0,$2)) }')"
+    ;;
+  seek-forward\ +10s)
+    cmus-remote --seek +10
+    track_time
+    notify-send -t 5000 --icon=info "cmus" "$position_min:$position_sec / $duration_min:$duration_sec"
+    ;;
+  seek-backward\ -10s)
+    cmus-remote --seek -10
+    track_time
+    notify-send -t 5000 --icon=info "cmus" "$position_min:$position_sec / $duration_min:$duration_sec"
+    ;;
+  seek-forward\ +1m)
+    cmus-remote --seek +1m
+    track_time
+    notify-send -t 5000 --icon=info "cmus" "$position_min:$position_sec / $duration_min:$duration_sec"
+    ;;
+  seek-backward\ -1m)
+    cmus-remote --seek -1m
+    track_time
+    notify-send -t 5000 --icon=info "cmus" "$position_min:$position_sec / $duration_min:$duration_sec"
+    ;;
+esac
