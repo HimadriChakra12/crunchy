@@ -13,41 +13,35 @@ mkdir -p "$PKG"
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
 SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi)
-SH_ONLY=(rsxiv sxat)
+SH_ONLY=(rsxiv)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
 
 for t in "${SIMPLE_TARGETS[@]}"; do
   echo ">> building $t"
-  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
+  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t" --depth 1
   ( cd "$PKG/$t" && make && make install )
 done
 for t in "${SH_ONLY[@]}"; do
   echo ">> building $t"
-  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
+  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t" --depth 1
   ( cd "$PKG/$t" && bash install.sh )
 done
 for t in "${SXBAR_ONLY[@]}"; do
   echo ">> building $t (no install)"
-  [ -d "$PKG/$t" ] || git clone "https://github.com/uint23/$t" "$PKG/$t"
+  [ -d "$PKG/$t" ] || git clone "https://github.com/uint23/$t" "$PKG/$t" --depth 1
   ( cd "$PKG/$t" && make && make install )
 done
 for t in "${RDFM_TARGET[@]}"; do
   echo ">> building $t"
-  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t"
-  ( cd "$PKG/$t" && \
-    git checkout -b config 2>/dev/null || git checkout config && \
-    bash install.bash )
+  [ -d "$PKG/$t" ] || git clone "$URL/$t" "$PKG/$t" --depth 1
+  ( cd "$PKG/$t" && bash install.bash )
 done
 
 rm -rf $PKG/*
 
-echo ">> cloning nvim config"
-[ -d /root/.config/nvim ] || git clone "$URL/himstart.nvim" /root/.config/nvim
-
-echo export MOZ_USE_XINPUT2=1 | sudo tee /etc/profile.d/use-xinput2.sh
+pacman -Scc --noconfirm
 
 chsh -s /bin/bash root
 
 systemctl enable NetworkManager.service
-systemctl start NetworkManager
