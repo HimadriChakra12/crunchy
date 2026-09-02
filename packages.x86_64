@@ -105,6 +105,7 @@ pacman-contrib
 
 git
 curl
+fzf
 github-cli
 lazygit
 neovim
@@ -115,6 +116,7 @@ sysstat
 tumbler
 playerctl
 network-manager-applet
+networkmanager
 bluetui
 eza
 gcc

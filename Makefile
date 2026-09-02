@@ -3,16 +3,32 @@ WORK_DIR    := $(HOME)/crunchy-work
 OUT_DIR     := /tmp/crunchy-out
 ISO         := $(shell ls $(OUT_DIR)/*.iso 2>/dev/null | head -n1)
 
-# set this to your actual VM's name (VBoxManage list vms) and its
-# storage controller name (VBoxManage showvminfo <name> | grep -i controller)
 VBOX_VM         ?= crunchy-test
 VBOX_CONTROLLER ?= IDE
 
-.PHONY: all build clean unmount run shell
+.PHONY: all build clean unmount run shell update-base reapply-boot-tweaks update
 
 all: build
 
-# unmount any stale chroot binds left by an interrupted previous build
+update-base:
+	sudo pacman -Sy --needed archiso
+	rsync -a --delete /usr/share/archiso/configs/releng/syslinux/ $(PROFILE_DIR)/syslinux/
+	rsync -a --delete /usr/share/archiso/configs/releng/efiboot/ $(PROFILE_DIR)/efiboot/
+	rsync -a --delete /usr/share/archiso/configs/releng/grub/ $(PROFILE_DIR)/grub/
+	@echo ">> boot-loader boilerplate refreshed from releng."
+	@echo ">> re-apply your cow_spacesize / hidden-menu / timeout edits to"
+	@echo "   syslinux/*.cfg, efiboot/loader/*, grub/grub.cfg if this overwrote them."
+
+reapply-boot-tweaks:
+	sed -i '/archisobasedir/ s/$$/ cow_spacesize=6G/' $(PROFILE_DIR)/syslinux/*.cfg
+	sed -i '/archisobasedir/ s/$$/ cow_spacesize=6G/' $(PROFILE_DIR)/efiboot/loader/entries/*.conf
+	sed -i 's/^TIMEOUT .*/TIMEOUT 1/' $(PROFILE_DIR)/syslinux/archiso_sys-linux.cfg
+	sed -i '/^TIMEOUT/a MENU HIDDEN' $(PROFILE_DIR)/syslinux/archiso_sys-linux.cfg
+	sed -i 's/^timeout .*/timeout 0/' $(PROFILE_DIR)/efiboot/loader/loader.conf
+	@echo ">> boot tweaks re-applied."
+
+update: update-base reapply-boot-tweaks build
+
 unmount:
 	-sudo umount -R $(WORK_DIR)/x86_64/airootfs/sys 2>/dev/null
 	-sudo umount -R $(WORK_DIR)/x86_64/airootfs/proc 2>/dev/null

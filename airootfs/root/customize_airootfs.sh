@@ -12,8 +12,8 @@ mkdir -p "$PKG"
 # build deps (git, make, gcc) now come from packages.x86_64 directly —
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
-SIMPLE_TARGETS=(rot shot px dtop baph lock fetch)
-SH_ONLY=(rsxiv)
+SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi)
+SH_ONLY=(rsxiv sxat)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
 
@@ -40,9 +40,14 @@ for t in "${RDFM_TARGET[@]}"; do
     bash install.bash )
 done
 
-# nvim config — cloned straight into root's home, not built
+rm -rf $PKG/*
+
 echo ">> cloning nvim config"
 [ -d /root/.config/nvim ] || git clone "$URL/himstart.nvim" /root/.config/nvim
 
-# root's default shell in releng is zsh (via grml-zsh-config) — force bash instead
+echo export MOZ_USE_XINPUT2=1 | sudo tee /etc/profile.d/use-xinput2.sh
+
 chsh -s /bin/bash root
+
+systemctl enable NetworkManager.service
+systemctl start NetworkManager
