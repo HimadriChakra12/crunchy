@@ -3,7 +3,7 @@
 # Features: Presets, custom time, till specific time, start/stop controls
 
 # Configuration
-TIMER_BIN="$HOME/.dotfiles/i3/scripts/i3blocks/timer" # Change this to the full path of your i3-timer binary
+TIMER_BIN="$HOME/.config/i3/scripts/i3blocks/timer" # Change this to the full path of your i3-timer binary
 ROFI_THEME=""                                         # Add your rofi theme here if you want (e.g., -theme ~/.config/rofi/timer.rasi)
 
 # Function to set timer with error handling

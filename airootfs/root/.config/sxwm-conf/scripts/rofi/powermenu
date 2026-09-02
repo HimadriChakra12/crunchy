@@ -26,6 +26,6 @@ case "$choice" in
         ;;
     Lock)
         # Example using i3lock
-        i3lock -i "$HOME/.dotfiles/i3/Wallpaper/Lock/Untitled.jpg"
+        i3lock -i "$HOME/.config/i3/Wallpaper/Lock/Untitled.jpg"
         ;;
 esac

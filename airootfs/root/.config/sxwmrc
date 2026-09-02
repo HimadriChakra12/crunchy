@@ -36,7 +36,7 @@ exec : "bash $HOME/.config/sxwm-conf/autostart"
 # ---------------------------------------------------------------------------
 # MEDIA / BRIGHTNESS KEYS
 # ---------------------------------------------------------------------------
-bind : XF86AudioRaiseVolume       : "bash $HOME/.dotfiles/sxwm-conf/scripts/volume_raise"
+bind : XF86AudioRaiseVolume       : "bash $HOME/.config/sxwm-conf/scripts/volume_raise"
 bind : shift + XF86AudioRaiseVolume : "pactl set-sink-volume @DEFAULT_SINK@ 140%"
 bind : XF86AudioLowerVolume       : "pactl set-sink-volume @DEFAULT_SINK@ -10%"
 bind : XF86MonBrightnessUp        : "brightnessctl set +10%"
@@ -69,16 +69,16 @@ bind : super + v               : "rofi -modi 'clipboard:greenclip print' -show c
 bind : super + u               : "bash $HOME/.config/sxwm-conf/scripts/rofi/urlman"
 bind : super + slash           : "bash $HOME/.config/sxwm-conf/scripts/rofi/cmd"
 bind : super + shift + u       : "sh $HOME/.config/sxwm-conf/scripts/rofi/urlsurf"
-bind : super + y               : "sh $HOME/.dotfiles/sxwm-conf/scripts/rofi/yt"
+bind : super + y               : "sh $HOME/.config/sxwm-conf/scripts/rofi/yt"
 
 bind : super + l : "lock"
 bind : super + e : "rdfm"
 bind : super + w : "chromium-bin"
 
-bind : alt + p          : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser http://localhost:3000"
-bind : super + i        : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://instagram.com"
-bind : super + f        : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://messenger.com"
-bind : super + shift + m : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://open.spotify.com"
+bind : alt + p          : "bash $HOME/.config/sxwm-conf/scripts/browser http://localhost:3000"
+bind : super + i        : "bash $HOME/.config/sxwm-conf/scripts/browser https://instagram.com"
+bind : super + f        : "bash $HOME/.config/sxwm-conf/scripts/browser https://messenger.com"
+bind : super + shift + m : "bash $HOME/.config/sxwm-conf/scripts/browser https://open.spotify.com"
 
 bind : super + shift + s : "shot"
 bind : alt + space        : "rofi -show drun"
