@@ -14,7 +14,6 @@ update-base:
 	sudo pacman -Sy --needed archiso
 	rsync -a --delete /usr/share/archiso/configs/releng/syslinux/ $(PROFILE_DIR)/syslinux/
 	rsync -a --delete /usr/share/archiso/configs/releng/efiboot/ $(PROFILE_DIR)/efiboot/
-	rsync -a --delete /usr/share/archiso/configs/releng/grub/ $(PROFILE_DIR)/grub/
 	@echo ">> boot-loader boilerplate refreshed from releng."
 	@echo ">> re-apply your cow_spacesize / hidden-menu / timeout edits to"
 	@echo "   syslinux/*.cfg, efiboot/loader/*, grub/grub.cfg if this overwrote them."
@@ -41,6 +40,7 @@ build: clean
 	mkdir -p $(OUT_DIR)/
 	sudo mkarchiso -v -w $(WORK_DIR) -o $(OUT_DIR) $(PROFILE_DIR)
 	@ls -lh $(OUT_DIR)/*.iso
+	@notify-send "ISO" "Your ISO is Complete Building" -t 350
 
 # power off the VM (ignore error if already off), repoint its optical
 # drive at the freshly built ISO, then boot it

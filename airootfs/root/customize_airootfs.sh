@@ -49,7 +49,6 @@ pacman -Scc --noconfirm
 chsh -s /bin/bash root
 
 systemctl enable NetworkManager.service
-systemctl enable doid.service
 
 useradd -m -G wheel,audio,video,input,storage,power,network -s /bin/bash himadri
 echo "himadri:himadri" | chpasswd
