@@ -1,0 +1,140 @@
+{
+	"policies": {
+		"AppAutoUpdate": true,
+		"AppAutoUpdate_comment": "Change to false to disable auto-updates.",
+		"DisableFirefoxStudies": true,
+		"DisableTelemetry": true,
+		"DisableFeedbackCommands": true,
+		"DisablePocket": true,
+		"DisableSetDesktopBackground": true,
+		"DisableDeveloperTools": false,
+		"DontCheckDefaultBrowser": true,
+		"DNSOverHTTPS": {
+			"Enabled": false,
+			"ProviderURL": "",
+			"Locked": false
+		},
+		"ManualAppUpdateOnly": false,
+		"ManualAppUpdateOnly_comment": "Change to true to disable auto-updates.",
+		"NoDefaultBookmarks": true,
+		"WebsiteFilter": {
+			"Block": [
+			]
+		},
+        "Preferences": {
+            "services.sync.engine.tabs": {
+                "Value": false,
+                "Status": "locked"
+            }
+        },
+		"ExtensionSettings": {
+			"*": {
+				"blocked_install_message": "Extension installation is managed by your administrator."
+			},
+
+			"uBlock0@raymondhill.net": {
+				"installation_mode": "force_installed",
+				"install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+			}
+		},
+        "Bookmarks": [
+            {
+                "Title": "",
+                "URL": "",
+                "Keyword": ""
+            }
+        ],
+		"SearchEngines": {
+			"PreventInstalls": false,
+			"Remove": [
+				"Amazon.com",
+				"eBay",
+                "Bing",
+                "DuckDuckGo"
+			],
+			"Default": "Brave",
+			"Add": [
+				{
+					"Name": "DuckDuckGo Lite",
+					"Description": "Minimal, ad-free version of DuckDuckGo",
+					"Alias": "ddg",
+					"Method": "POST",
+					"URLTemplate": "https://duckduckgo.com/lite/?q={searchTerms}",
+					"PostData": "q={searchTerms}"
+				},
+				{
+					"Name": "SearXNG",
+					"Description": "A privacy-respecting, hackable metasearch engine",
+					"Alias": "srx",
+					"Method": "POST",
+					"URLTemplate": "https://searx.be/?q={searchTerms}",
+					"PostData": "q={searchTerms}&time_range=&language=en-US&category_general=on"
+				},
+				{
+					"Name": "MetaGer",
+					"Description": "MetaGer: Privacy Protected Search & Find",
+					"Alias": "mg",
+					"Method": "GET",
+					"URLTemplate": "https://metager.org/meta/meta.ger3?eingabe={searchTerms}"
+				},
+				{
+					"Name": "StartPage",
+					"Description": "The world's most private search engine",
+					"Alias": "st",
+					"Method": "GET",
+					"URLTemplate": "https://www.startpage.com/sp/search?query={searchTerms}"
+				},
+				{
+					"Name": "Brave",
+					"Description": "The world's most private search engine",
+					"Alias": "bbg",
+					"Method": "GET",
+					"URLTemplate": "https://search.brave.com/search?q={searchTerms}"
+				},
+				{
+					"Name": "YouTube",
+					"Description": "Search On Youtube",
+					"Alias": "yt",
+					"Method": "GET",
+					"URLTemplate": "https://www.youtube.com/results?search_query={searchTerms}"
+				},
+				{
+					"Name": "GetIntoPC",
+					"Description": "Getintopc Search",
+					"Alias": "gt",
+					"Method": "GET",
+					"URLTemplate": "https://getintopc.com/?s={searchTerms}"
+				},
+				{
+					"Name": "Reddit",
+					"Description": "Reddit Search",
+					"Alias": "rs",
+					"Method": "GET",
+					"URLTemplate": "https://www.reddit.com/search/?q={searchTerms}"
+				},
+				{
+					"Name": "SubReddit",
+					"Description": "Subreddit Search",
+					"Alias": "rr",
+					"Method": "GET",
+					"URLTemplate": "https://www.reddit.com/r/{searchTerms}"
+				},
+				{
+					"Name": "RDG",
+					"Description": "Reddit Search",
+					"Alias": "rd",
+					"Method": "GET",
+					"URLTemplate": "https://www.google.com/search?q=site:reddit.com+{searchTerms}"
+				},
+				{
+					"Name": "gWeb",
+					"Description": "Google Web Search",
+					"Alias": "gw",
+					"Method": "GET",
+					"URLTemplate": "https://www.google.com/search?q={searchTerms}&udm=14"
+				}
+			]
+		}
+	}
+}
+

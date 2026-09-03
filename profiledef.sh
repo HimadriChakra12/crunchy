@@ -2,10 +2,10 @@
 # himos archiso profile definition
 
 iso_name="crunchy"
-iso_label="CRUNCHY_$(date +%Y%m)"
+iso_label="CRUNCHY_$(cat VERSION)"
 iso_publisher="Himadri Chakra <https://github.com/HimadriChakra12>"
 iso_application="crunchy Live/Rescue medium (Xorg + sxwm)"
-iso_version="$(date +%Y.%m.%d)"
+iso_version="$(cat VERSION)"
 install_dir="arch"
 buildmodes=('iso')
 bootmodes=('bios.syslinux.mbr' 'bios.syslinux.eltorito'

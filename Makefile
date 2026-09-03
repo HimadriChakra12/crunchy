@@ -1,6 +1,6 @@
 PROFILE_DIR := $(shell pwd)
 WORK_DIR    := $(HOME)/crunchy-work
-OUT_DIR     := /tmp/crunchy-out
+OUT_DIR     := $(HOME)/release/
 ISO         := $(shell ls $(OUT_DIR)/*.iso 2>/dev/null | head -n1)
 
 VBOX_VM         ?= crunchy-test
@@ -38,6 +38,7 @@ clean: unmount
 	sudo rm -rf $(WORK_DIR) $(OUT_DIR)
 
 build: clean
+	mkdir -p $(OUT_DIR)/
 	sudo mkarchiso -v -w $(WORK_DIR) -o $(OUT_DIR) $(PROFILE_DIR)
 	@ls -lh $(OUT_DIR)/*.iso
 
