@@ -13,6 +13,7 @@ mkdir -p "$PKG"
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
 SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi)
+# doid builds/installs alongside doi from the same repo, not a separate clone
 SH_ONLY=(rsxiv)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
@@ -50,8 +51,13 @@ chsh -s /bin/bash root
 
 systemctl enable NetworkManager.service
 
-useradd -m -G wheel,audio,video,input,storage,power,network -s /bin/bash himadri
-echo "himadri:himadri" | chpasswd
+useradd -m -G wheel,audio,video,input,storage,power,network -s /bin/bash crunchy
+echo "crunchy:crunchy" | chpasswd
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel-nopasswd
 chmod 440 /etc/sudoers.d/wheel-nopasswd
 
+# home/crunchy/* was committed straight into the profile (not via
+# /etc/skel), so it lands owned by root when the airootfs overlay is
+# applied — useradd -m won't fix ownership of files that already
+# existed before it ran, only fresh skel copies. Fix explicitly:
+chown -R crunchy:crunchy /home/crunchy
