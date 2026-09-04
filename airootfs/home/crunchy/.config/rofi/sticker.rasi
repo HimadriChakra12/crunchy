@@ -1,0 +1,109 @@
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    drun-display-format: "{name}";
+}
+
+/* ======================
+   Colors
+   ====================== */
+* {
+    bg: #282828;
+bgt: #28282895;
+    fg: #d4be98;
+
+  selected-bg: @fg;
+  selected-fg: @bg;
+
+    transparent: transparent;
+}
+
+/* ======================
+   Window
+   ====================== */
+window {
+    fullscreen: true;
+    padding: 18% 25%;
+    transparency: "real";
+    background-color: @bgt;
+}
+
+/* ======================
+   Main layout
+   ====================== */
+mainbox {
+    background-color: @transparent;
+}
+
+listview {
+    columns: 2;
+    lines: 4;
+    spacing: 20px;
+    fixed-height: true;
+    background-color: @transparent;
+}
+
+/* ======================
+   Input / prompt (FIX WHITE BAR)
+   ====================== */
+inputbar {
+    background-color: @transparent;
+    padding: 20px;
+}
+
+prompt {
+    background-color: @transparent;
+    text-color: @fg;
+}
+
+entry {
+    background-color: @transparent;
+    text-color: @fg;
+}
+
+
+/* ======================
+   Sticker tiles (FIX WHITE CARDS)
+   ====================== */
+element {
+    orientation: vertical;
+    padding: 8px;
+    background-color: @transparent;
+    border-radius: 10px;
+}
+
+element normal {
+    background-color: @transparent;
+    text-color: @fg;
+}
+
+element alternate {
+    background-color: @transparent;
+}
+
+element selected {
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}
+
+/* ======================
+   Sticker visuals
+   ====================== */
+element-icon {
+    size: 128px;
+    background-color: @transparent;
+}
+
+element-text {
+    background-color: @transparent;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: @fg;
+}
+element-text selected {
+    background-color: @transparent;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: @selected-fg;
+}

@@ -1,0 +1,134 @@
+# ~/.config/sxwmrc
+# Converted from an sxwm-conf config. sxwm is much simpler than i3 — see the notes
+# at the bottom of this file for things sxwm-conf could do that sxwm can't.
+
+# ---------------------------------------------------------------------------
+# GENERAL OPTIONS
+# ---------------------------------------------------------------------------
+mod_key                 : alt
+gaps                     : 6
+border_width             : 0
+focused_border_colour    : #e2d2ab
+unfocused_border_colour  : #8d846f
+swap_border_colour       : #fff4c0
+master_width             : 50
+new_win_focus            : true
+warp_cursor              : true
+floating_on_top          : true
+new_win_master           : false
+
+# Windows that should always float (from your for_window floating rules)
+should_float             : "dtop", "tk", "xdm-app", "Xdm-app", "localsend", "galculator", "proton-authenticator-bin"
+
+# Terminal swallowing (roughly mirrors your btop/mpv floating-terminal setup)
+can_swallow              : st
+can_be_swallowed         : mpv, btop
+
+# ---------------------------------------------------------------------------
+# STARTUP (was your `exec` / `exec_always` block)
+# ---------------------------------------------------------------------------
+exec : "xsetroot -cursor_name left_ptr &"
+exec : "env GTK_THEME=Adwaita:dark &"
+exec : "xclip &"
+exec : "rsxiv -B $HOME/.config/Wallpaper/Wallpaper"
+exec : "bash $HOME/.config/sxwm-conf/autostart"
+
+# ---------------------------------------------------------------------------
+# MEDIA / BRIGHTNESS KEYS
+# ---------------------------------------------------------------------------
+bind : XF86AudioRaiseVolume       : "bash $HOME/.config/sxwm-conf/scripts/volume_raise"
+bind : shift + XF86AudioRaiseVolume : "pactl set-sink-volume @DEFAULT_SINK@ 140%"
+bind : XF86AudioLowerVolume       : "pactl set-sink-volume @DEFAULT_SINK@ -10%"
+bind : XF86MonBrightnessUp        : "brightnessctl set +10%"
+bind : XF86MonBrightnessDown      : "brightnessctl set 10%-"
+bind : XF86AudioMute              : "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+bind : XF86AudioMicMute           : "pactl set-source-mute @DEFAULT_SOURCE@ toggle"
+
+# ---------------------------------------------------------------------------
+# CUSTOM SCRIPTS / LAUNCHERS
+# ---------------------------------------------------------------------------
+bind : alt + shift + p    : "bash $HOME/.config/sxwm-conf/scripts/rofi/powerrofi"
+bind : alt + r            : "bash $HOME/.config/sxwm-conf/scripts/nightlight"
+bind : alt + shift + m    : "bash $HOME/.config/sxwm-conf/scripts/rofi/library"
+bind : alt + Return       : "st"
+
+bind : super + shift + c      : "px"
+bind : super + shift + period : "bash $HOME/.config/sxwm-conf/scripts/rofi/stickerpicker"
+bind : super + Tab            : "rofi -show window"
+bind : super + comma          : "bash $HOME/.config/sxwm-conf/scripts/rofi/wallpaper"
+bind : super + g               : "bash $HOME/.config/sxwm-conf/scripts/rofi/gamelauncher"
+bind : alt + shift + b         : "bash $HOME/.config/sxwm-conf/scripts/rofi/bluetooth"
+bind : super + m               : "bash $HOME/.config/sxwm-conf/scripts/rofi/musicpicker"
+bind : super + p               : "bash $HOME/.config/sxwm-conf/scripts/rofi/powermenu"
+bind : super + period          : "bash $HOME/.config/sxwm-conf/scripts/rofi/emojipicker"
+bind : super + r               : "bash $HOME/.config/sxwm-conf/scripts/rofi/screenrecorder"
+bind : alt + shift + t         : "bash $HOME/.config/sxwm-conf/scripts/rofi/timer"
+bind : super + s               : "bash $HOME/.config/sxwm-conf/scripts/empty_workspace"
+bind : super + shift + w       : "bash $HOME/.config/sxwm-conf/scripts/recog.sh"
+bind : super + v               : "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'"
+bind : super + u               : "bash $HOME/.config/sxwm-conf/scripts/rofi/urlman"
+bind : super + slash           : "bash $HOME/.config/sxwm-conf/scripts/rofi/cmd"
+bind : super + shift + u       : "sh $HOME/.config/sxwm-conf/scripts/rofi/urlsurf"
+bind : super + y               : "sh $HOME/.config/sxwm-conf/scripts/rofi/yt"
+
+bind : super + l : "lock"
+bind : super + e : "rdfm"
+bind : super + w : "chromium-bin"
+
+bind : alt + p          : "bash $HOME/.config/sxwm-conf/scripts/browser http://localhost:3000"
+bind : super + i        : "bash $HOME/.config/sxwm-conf/scripts/browser https://instagram.com"
+bind : super + f        : "bash $HOME/.config/sxwm-conf/scripts/browser https://messenger.com"
+bind : super + shift + m : "bash $HOME/.config/sxwm-conf/scripts/browser https://open.spotify.com"
+
+bind : super + shift + s : "shot"
+bind : alt + space        : "rofi -show drun"
+
+bind : ctrl + shift + Escape : "st -t btop -c btop -e btop"
+# ---------------------------------------------------------------------------
+# WINDOW / FOCUS MANAGEMENT
+# ---------------------------------------------------------------------------
+bind : alt + Down  : focus_next
+bind : alt + Up    : focus_prev
+bind : alt + Tab   : focus_next
+
+bind : alt + shift + h : move_win_left
+bind : alt + shift + j : move_win_down
+bind : alt + shift + k : move_win_up
+bind : alt + shift + l : move_win_right
+
+bind : alt + f       : fullscreen
+bind : alt + w       : toggle_monocle
+bind : alt + t       : toggle_floating
+bind : alt + shift + q : close_window
+bind : alt + shift + r : reload_config
+
+bind : alt + bracketleft  : switch_previous_workspace
+bind : alt + bracketright : switch_previous_workspace
+
+# ---------------------------------------------------------------------------
+# WORKSPACES
+# (sxwm workspaces are numbered only — named workspaces aren't supported)
+# ---------------------------------------------------------------------------
+workspace : alt + 1 : move 1
+workspace : alt + 2 : move 2
+workspace : alt + 3 : move 3
+workspace : alt + 4 : move 4
+workspace : alt + 5 : move 5
+workspace : alt + 6 : move 6
+workspace : alt + 7 : move 7
+workspace : alt + 8 : move 8
+workspace : alt + 9 : move 9
+workspace : alt + 0 : move 10
+
+workspace : alt + shift + 1 : swap 1
+workspace : alt + shift + 2 : swap 2
+workspace : alt + shift + 3 : swap 3
+workspace : alt + shift + 4 : swap 4
+workspace : alt + shift + 5 : swap 5
+workspace : alt + shift + 6 : swap 6
+workspace : alt + shift + 7 : swap 7
+workspace : alt + shift + 8 : swap 8
+workspace : alt + shift + 9 : swap 9
+workspace : alt + shift + 0 : swap 10
+
+bind : alt + b : "firefox"

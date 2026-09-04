@@ -1,0 +1,10 @@
+#!bin/bash
+
+#sxbar &
+xdman-beta &
+doid &
+greenclip daemon &
+bash $HOME/.config/sxwm-conf/scripts/nightlight &
+libinput-gestures &
+sxbar &
+nm-applet &

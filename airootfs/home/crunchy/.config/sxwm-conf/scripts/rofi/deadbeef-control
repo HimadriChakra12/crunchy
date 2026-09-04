@@ -1,0 +1,48 @@
+#!/bin/bash
+
+options="▶ Play/Pause
+⏸ Pause
+⏹ Stop
+⏭ Next
+⏮ Previous
+🔀 Random
+🔊 Volume +
+🔉 Volume -
+📄 Now Playing
+❌ Quit"
+
+choice=$(echo -e "$options" | rofi -dmenu -i -p "Deadbeef")
+
+case "$choice" in
+    "▶ Play/Pause")
+        deadbeef --play-pause
+        ;;
+    "⏸ Pause")
+        deadbeef --pause
+        ;;
+    "⏹ Stop")
+        deadbeef --stop
+        ;;
+    "⏭ Next")
+        deadbeef --next
+        ;;
+    "⏮ Previous")
+        deadbeef --prev
+        ;;
+    "🔀 Random")
+        deadbeef --random
+        ;;
+    "🔊 Volume +")
+        deadbeef --volume +5
+        ;;
+    "🔉 Volume -")
+        deadbeef --volume -5
+        ;;
+    "📄 Now Playing")
+        deadbeef --nowplaying-tf "%artist% - %title%" | rofi -dmenu -p "Now Playing"
+        ;;
+    "❌ Quit")
+        deadbeef --quit
+        ;;
+esac
+

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Extract only valid profile names
+profiles=$(powerprofilesctl list |
+  sed -n 's/^[* ]*\([a-z-]\+\):$/\1/p')
+
+# Get current profile
+current=$(powerprofilesctl get)
+
+# Get index of current profile
+selected_row=$(echo "$profiles" | awk -v cur="$current" '{if ($0==cur) print NR-1}')
+
+# Show rofi menu
+choice=$(echo "$profiles" | rofi -dmenu -i -p "Power Profile" -selected-row "${selected_row:-0}")
+
+# Exit if nothing selected
+[ -z "$choice" ] && exit 0
+
+# Set selected profile
+powerprofilesctl set "$choice"

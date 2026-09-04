@@ -1,0 +1,99 @@
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    drun-display-format: "{name}";
+}
+
+/* ======================
+   Colors
+   ====================== */
+* {
+    bg: #282828;
+    bgt: #28282895;
+    fg: #d4be98;
+
+  selected-bg: @fg;
+  selected-fg: @bg;
+
+    transparent: transparent;
+}
+
+/* ======================
+   Window
+   ====================== */
+window {
+    fullscreen: true;
+    padding: 13% 15%;
+    transparency: "real";
+    background-color: @bgt;
+}
+
+/* ======================
+   Main layout
+   ====================== */
+mainbox {
+    background-color: @transparent;
+}
+
+listview {
+    columns: 4;
+    lines: 5;
+    spacing: 10px;
+    fixed-height: true;
+    background-color: @transparent;
+}
+
+
+/* ======================
+   Sticker tiles (FIX WHITE CARDS)
+   ====================== */
+element {
+    orientation: vertical;
+    background-color: @transparent;
+    border-radius: 10px;
+}
+
+element normal {
+    background-color: @transparent;
+    text-color: @fg;
+}
+
+element alternate {
+    background-color: @transparent;
+}
+
+element selected {
+    background-color: @selected-bg;
+    text-color: @selected-fg;
+}
+
+/* ======================
+   Sticker visuals
+   ====================== */
+element-icon {
+    size: 254px;
+    background-color: @transparent;
+}
+
+element-text {
+    enabled: false;
+}
+element-text selected {
+    background-color: @transparent;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: @selected-fg;
+}
+inputbar {
+    enabled: false;
+}
+
+prompt {
+    enabled: false;
+}
+
+entry {
+    enabled: false;
+}
+
