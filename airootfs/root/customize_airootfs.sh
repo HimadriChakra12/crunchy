@@ -51,13 +51,14 @@ chsh -s /bin/bash root
 
 systemctl enable NetworkManager.service
 
+systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.service
+
 useradd -m -G wheel,audio,video,input,storage,power,network -s /bin/bash crunchy
 echo "crunchy:crunchy" | chpasswd
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel-nopasswd
 chmod 440 /etc/sudoers.d/wheel-nopasswd
 
-# home/crunchy/* was committed straight into the profile (not via
-# /etc/skel), so it lands owned by root when the airootfs overlay is
-# applied — useradd -m won't fix ownership of files that already
-# existed before it ran, only fresh skel copies. Fix explicitly:
+mkdir -p /var/lib/systemd/linger
+touch /var/lib/systemd/linger/crunchy
+
 chown -R crunchy:crunchy /home/crunchy
