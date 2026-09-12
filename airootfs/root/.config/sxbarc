@@ -1,8 +1,8 @@
 # layout and style
 bottom_bar          : true
 height              : 25
-vertical_padding    : 0
-horizontal_padding  : 0
+vertical_padding    : 10
+horizontal_padding  : 200
 text_padding        : 0
 border              : false
 border_width        : 1
@@ -10,7 +10,7 @@ background_colour   : #282828
 foreground_colour   : #d8c9a4
 border_colour       : #e2d2ab
 font                : "Jetbrains Mono Nerd Font"
-font_size           : 13
+font_size           : 12
 
 # modules
 module.0.name       : clock
@@ -43,17 +43,12 @@ module.5.cmd        : free -h | awk '/^Mem/ { print $3 }' | sed s/i//g
 module.5.enabled    : true
 module.5.interval   : 3
 
-module.6.name       : trayspace
-module.6.cmd        : tray
-module.6.enabled    : true
-module.6.interval   : 3
-
 workspaces.labels              : ! @ $ % ^ & * ( )
 workspaces.active_background   : #e2d2ab
 workspaces.active_foreground   : #282828
 workspaces.inactive_background : #282828
 workspaces.inactive_foreground : #e2d2ab
-workspaces.padding_left        : 10
-workspaces.padding_right       : 10
+workspaces.padding_left        : 8
+workspaces.padding_right       : 8
 workspaces.spacing             : 1
 workspaces.position            : left

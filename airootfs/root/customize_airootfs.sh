@@ -12,7 +12,7 @@ mkdir -p "$PKG"
 # build deps (git, make, gcc) now come from packages.x86_64 directly —
 # no need to pacman -S them here, saves a redundant ~230MB transaction
 # mid-build that was the actual cause of the disk-space failure
-SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi)
+SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi stray)
 # doid builds/installs alongside doi from the same repo, not a separate clone
 SH_ONLY=(rsxiv)
 SXBAR_ONLY=(sxbar)
@@ -44,6 +44,7 @@ done
 rm -rf $PKG/*
 
 [ -d /root/.config/nvim ] || git clone https://github.com/HimadriChakra12/himstart.nvim /root/.config/nvim
+[ -d /home/crunchy/.config/nvim ] || git clone https://github.com/HimadriChakra12/himstart.nvim /home/crunchy/.config/nvim
 
 pacman -Scc --noconfirm
 

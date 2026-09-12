@@ -18,7 +18,7 @@ floating_on_top          : true
 new_win_master           : false
 
 # Windows that should always float (from your for_window floating rules)
-should_float             : "dtop", "tk", "xdm-app", "Xdm-app", "localsend", "galculator", "proton-authenticator-bin"
+should_float             : "dtop", "tk", "xdm-app", "Xdm-app", "localsend", "galculator"
 
 # Terminal swallowing (roughly mirrors your btop/mpv floating-terminal setup)
 can_swallow              : st
@@ -36,7 +36,7 @@ exec : "bash $HOME/.config/sxwm-conf/autostart"
 # ---------------------------------------------------------------------------
 # MEDIA / BRIGHTNESS KEYS
 # ---------------------------------------------------------------------------
-bind : XF86AudioRaiseVolume       : "bash $HOME/.config/sxwm-conf/scripts/volume_raise"
+bind : XF86AudioRaiseVolume       : "bash $HOME/.dotfiles/sxwm-conf/scripts/volume_raise"
 bind : shift + XF86AudioRaiseVolume : "pactl set-sink-volume @DEFAULT_SINK@ 140%"
 bind : XF86AudioLowerVolume       : "pactl set-sink-volume @DEFAULT_SINK@ -10%"
 bind : XF86MonBrightnessUp        : "brightnessctl set +10%"
@@ -55,6 +55,7 @@ bind : alt + Return       : "st"
 bind : super + shift + c      : "px"
 bind : super + shift + period : "bash $HOME/.config/sxwm-conf/scripts/rofi/stickerpicker"
 bind : super + Tab            : "rofi -show window"
+bind : alt + Tab              : "twsk"
 bind : super + comma          : "bash $HOME/.config/sxwm-conf/scripts/rofi/wallpaper"
 bind : super + g               : "bash $HOME/.config/sxwm-conf/scripts/rofi/gamelauncher"
 bind : alt + shift + b         : "bash $HOME/.config/sxwm-conf/scripts/rofi/bluetooth"
@@ -69,16 +70,16 @@ bind : super + v               : "rofi -modi 'clipboard:greenclip print' -show c
 bind : super + u               : "bash $HOME/.config/sxwm-conf/scripts/rofi/urlman"
 bind : super + slash           : "bash $HOME/.config/sxwm-conf/scripts/rofi/cmd"
 bind : super + shift + u       : "sh $HOME/.config/sxwm-conf/scripts/rofi/urlsurf"
-bind : super + y               : "sh $HOME/.config/sxwm-conf/scripts/rofi/yt"
+bind : super + y               : "sh $HOME/.dotfiles/sxwm-conf/scripts/rofi/yt"
 
 bind : super + l : "lock"
 bind : super + e : "rdfm"
 bind : super + w : "chromium-bin"
 
-bind : alt + p          : "bash $HOME/.config/sxwm-conf/scripts/browser http://localhost:3000"
-bind : super + i        : "bash $HOME/.config/sxwm-conf/scripts/browser https://instagram.com"
-bind : super + f        : "bash $HOME/.config/sxwm-conf/scripts/browser https://messenger.com"
-bind : super + shift + m : "bash $HOME/.config/sxwm-conf/scripts/browser https://open.spotify.com"
+bind : alt + p          : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser http://localhost:3000"
+bind : super + i        : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://instagram.com"
+bind : super + f        : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://messenger.com"
+bind : super + shift + m : "bash $HOME/.dotfiles/sxwm-conf/scripts/browser https://open.spotify.com"
 
 bind : super + shift + s : "shot"
 bind : alt + space        : "rofi -show drun"
@@ -87,9 +88,8 @@ bind : ctrl + shift + Escape : "st -t btop -c btop -e btop"
 # ---------------------------------------------------------------------------
 # WINDOW / FOCUS MANAGEMENT
 # ---------------------------------------------------------------------------
-bind : alt + Down  : focus_next
-bind : alt + Up    : focus_prev
-bind : alt + Tab   : focus_next
+bind : alt + l  : focus_next
+bind : alt + h    : focus_prev
 
 bind : alt + shift + h : move_win_left
 bind : alt + shift + j : move_win_down
