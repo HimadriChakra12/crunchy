@@ -1,5 +1,0 @@
-#!/bin/bash
-
-BOOKDIR="$HOME/books"
-
-sxbv $BOOKDIR
