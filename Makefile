@@ -1,5 +1,5 @@
 NAME        := crunchy
-VER         := v4.0.0
+VER         := $(shell cat VERSION)
 
 PROFILE_DIR := $(shell pwd)
 WORK_DIR    := $(HOME)/crunchy-work
