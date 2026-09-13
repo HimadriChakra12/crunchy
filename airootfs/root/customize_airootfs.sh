@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
+
 # customize_airootfs.sh
 # Auto-run by mkarchiso INSIDE the build chroot (needs network access
 # during the build — mkarchiso's chroot has it by default unless you
 # pass --offline). Removed automatically before the final squashfs is
 # sealed, so none of this lingers in the shipped image — only the
 # compiled binaries do.
+
 set -euo pipefail
 URL="https://github.com/HimadriChakra12"
 PKG="/root/pkg"
 mkdir -p "$PKG"
-# build deps (git, make, gcc) now come from packages.x86_64 directly —
-# no need to pacman -S them here, saves a redundant ~230MB transaction
-# mid-build that was the actual cause of the disk-space failure
 SIMPLE_TARGETS=(rot shot px dtop baph lock fetch doi stray)
-# doid builds/installs alongside doi from the same repo, not a separate clone
 SH_ONLY=(rsxiv)
 SXBAR_ONLY=(sxbar)
 RDFM_TARGET=(rdfm)
@@ -43,7 +41,6 @@ done
 
 rm -rf $PKG/*
 
-[ -d /root/.config/nvim ] || git clone https://github.com/HimadriChakra12/himstart.nvim /root/.config/nvim
 [ -d /home/crunchy/.config/nvim ] || git clone https://github.com/HimadriChakra12/himstart.nvim /home/crunchy/.config/nvim
 
 pacman -Scc --noconfirm
@@ -51,7 +48,6 @@ pacman -Scc --noconfirm
 chsh -s /bin/bash root
 
 systemctl enable NetworkManager.service
-
 systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.service
 
 useradd -m -G wheel,audio,video,input,storage,power,network -s /bin/bash crunchy

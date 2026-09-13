@@ -1,3 +1,6 @@
+NAME        := crunchy
+VER         := v4.0.0
+
 PROFILE_DIR := $(shell pwd)
 WORK_DIR    := $(HOME)/crunchy-work
 OUT_DIR     := $(HOME)/release/
@@ -6,7 +9,7 @@ ISO         := $(shell ls $(OUT_DIR)/*.iso 2>/dev/null | head -n1)
 VBOX_VM         ?= crunchy-test
 VBOX_CONTROLLER ?= IDE
 
-.PHONY: all build clean unmount run shell update-base reapply-boot-tweaks update
+.PHONY: all build clean unmount run shell update-base reapply-boot-tweaks update rsync
 
 all: build
 
@@ -54,3 +57,8 @@ run:
 # just unmount + wipe without rebuilding, if a build died mid-way
 shell:
 	@echo "ISO: $(ISO)"
+
+rsync:
+	@rsync -avP -e ssh \
+		$(OUTDIR)/"$(NAME)-$(VER)-x86_64.iso" \
+		"himadrichakra12@frs.sourceforge.net:/home/frs/project/him12crunchy/$(VER)/"
