@@ -59,6 +59,6 @@ shell:
 	@echo "ISO: $(ISO)"
 
 rsync:
-	@rsync -avP -e ssh \
-		$(OUTDIR)/"$(NAME)-$(VER)-x86_64.iso" \
+	rsync -avP -e ssh \
+		$(OUT_DIR)/"$(NAME)-$(VER)-x86_64.iso" \
 		"himadrichakra12@frs.sourceforge.net:/home/frs/project/him12crunchy/$(VER)/"

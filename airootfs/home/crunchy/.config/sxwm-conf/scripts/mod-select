@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+STATE="$HOME/.config/sxwm-mod-choice"
+TEMPLATE="$HOME/.config/sxwmrc.template"
+TARGET="$HOME/.config/sxwmrc"
+
+if [ ! -f "$STATE" ]; then
+  choice=$(printf "Alt\nSuper" | rofi -dmenu -p "mod key")
+  [ -z "$choice" ] && choice="Alt"
+  echo "$choice" > "$STATE"
+fi
+
+choice=$(cat "$STATE")
+
+if [ "$choice" = "Super" ]; then
+  mod="super"
+  altmod="alt"
+else
+  mod="alt"
+  altmod="super"
+fi
+
+sed "s/\$mod/$mod/g; s/\$altmod/$altmod/g" "$TEMPLATE" > "$TARGET"
